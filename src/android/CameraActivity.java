@@ -116,6 +116,10 @@ public class CameraActivity extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    if (savedInstanceState != null) {
+      return null;
+    }
+
     appResourcesPackage = getActivity().getPackageName();
 
     // Inflate the layout for this fragment
@@ -123,6 +127,12 @@ public class CameraActivity extends Fragment {
     createCameraPreview();
     return view;
   }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("int", 10);
+    }
 
   public void setRect(int x, int y, int width, int height){
     this.x = x;
@@ -283,6 +293,10 @@ public class CameraActivity extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
+
+    if (mPreview == null) {
+      return;
+    }
 
     mCamera = Camera.open(defaultCameraId);
 

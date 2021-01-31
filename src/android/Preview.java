@@ -31,6 +31,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
   int facing = Camera.CameraInfo.CAMERA_FACING_BACK;
   int viewWidth;
   int viewHeight;
+  boolean suppliedNullCamera;
 
   Preview(Context context) {
     super(context);
@@ -48,10 +49,9 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
   }
 
   public void setCamera(Camera camera, int cameraId) {
-    mCamera = camera;
-    this.cameraId = cameraId;
-
     if (camera != null) {
+      mCamera = camera;
+      this.cameraId = cameraId;
       mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
       setCameraDisplayOrientation();
 
@@ -67,6 +67,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
       }
       mCamera.setParameters(params);
     }
+    suppliedNullCamera = (camera == null);
   }
 
   public int getDisplayOrientation() {
@@ -109,9 +110,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
         degrees = 270;
         break;
     }
-
     facing = info.facing;
-
     if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
       displayOrientation = (info.orientation + degrees) % 360;
       displayOrientation = (360 - displayOrientation) % 360;
@@ -121,8 +120,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
 
     Log.d(TAG, "screen is rotated " + degrees + "deg from natural");
     Log.d(TAG, (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT ? "front" : "back") + " camera is oriented -" + info.orientation + "deg from natural");
-    Log.d(TAG, "rotating preview " + displayOrientation + "deg");
-
+    Log.d(TAG, "need to rotate preview " + displayOrientation + "deg");
     mCamera.setDisplayOrientation(displayOrientation);
   }
 
@@ -237,7 +235,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
   public void surfaceDestroyed(SurfaceHolder holder) {
     // Surface will be destroyed when we return, so stop the preview.
     try {
-      if (mCamera != null) {
+      if (mCamera != null && !suppliedNullCamera) {
         mCamera.stopPreview();
       }
     } catch (Exception exception) {
