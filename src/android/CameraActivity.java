@@ -348,6 +348,7 @@ public class CameraActivity extends Fragment {
       setDefaultCameraId();
       mPreview.setCamera(null, -1);
       mCamera.setPreviewCallback(null);
+      mCamera.stopPreview();
       mCamera.release();
       mCamera = null;
     }
